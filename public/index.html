@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Envíos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>📦 Sistema de Gestión de Envíos</h1>
+                <div class="bluetooth-status">
+                    <span class="status-dot disconnected" id="bluetooth-status-dot"></span>
+                    <span id="bluetooth-status-text">Desconectado</span>
+                    <button class="btn btn-small btn-primary" id="connect-bluetooth">Conectar Impresora</button>
+                    <button class="btn btn-small btn-secondary" id="disconnect-bluetooth" style="display: none;">Desconectar</button>
+                </div>
+            </div>
+            <nav>
+                <button class="nav-btn active" data-view="form">Nuevo Envío</button>
+                <button class="nav-btn" data-view="list">Historial</button>
+                <button class="nav-btn" data-view="reports">Reportes</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Vista de Formulario -->
+            <section id="form-view" class="view active">
+                <div class="form-container">
+                    <h2>Registrar Nuevo Envío</h2>
+                    <form id="shipment-form">
+                        <!-- Información del Remitente -->
+                        <div class="form-section">
+                            <h3>📤 Información del Remitente</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="sender_name">Nombre Completo *</label>
+                                    <input type="text" id="sender_name" name="sender_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="sender_phone">Teléfono *</label>
+                                    <input type="tel" id="sender_phone" name="sender_phone" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información del Destinatario -->
+                        <div class="form-section">
+                            <h3>📥 Información del Destinatario</h3>
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="recipient_name">Nombre Completo *</label>
+                                    <input type="text" id="recipient_name" name="recipient_name" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="recipient_address">Dirección Completa *</label>
+                                    <input type="text" id="recipient_address" name="recipient_address" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="recipient_postal_code">Código Postal *</label>
+                                    <input type="text" id="recipient_postal_code" name="recipient_postal_code" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="recipient_state">Estado *</label>
+                                    <input type="text" id="recipient_state" name="recipient_state" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="recipient_phone">Teléfono *</label>
+                                    <input type="tel" id="recipient_phone" name="recipient_phone" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información del Servicio -->
+                        <div class="form-section">
+                            <h3>🚚 Información del Servicio</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="service_type">Tipo de Servicio *</label>
+                                    <select id="service_type" name="service_type" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="Nacional">Nacional</option>
+                                        <option value="Internacional">Internacional</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="carrier">Paquetería *</label>
+                                    <select id="carrier" name="carrier" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="DHL">DHL</option>
+                                        <option value="FedEx">FedEx</option>
+                                        <option value="Estafeta">Estafeta</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información Financiera -->
+                        <div class="form-section">
+                            <h3>💰 Información Financiera</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="price">Precio *</label>
+                                    <input type="number" id="price" name="price" step="0.01" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="iva">IVA (%) *</label>
+                                    <input type="number" id="iva_percent" value="16" step="0.01" min="0">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="discount">Descuento</label>
+                                    <input type="number" id="discount" name="discount" step="0.01" min="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="total">Total</label>
+                                    <input type="number" id="total" name="total" step="0.01" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Registrar Envío</button>
+                            <button type="button" class="btn btn-secondary" id="clear-form">Limpiar Formulario</button>
+                        </div>
+                    </form>
+
+                    <!-- Acciones después de registrar -->
+                    <div id="success-actions" class="success-actions" style="display: none;">
+                        <div class="success-message">
+                            <h3>✅ Envío Registrado Exitosamente</h3>
+                            <p>Folio: <span id="shipment-id"></span></p>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-success" id="download-pdf">📄 Descargar PDF</button>
+                            <button class="btn btn-success" id="download-ticket">🎫 Descargar Ticket</button>
+                            <button class="btn btn-info" id="print-bluetooth" disabled>🖨️ Imprimir Bluetooth</button>
+                            <button class="btn btn-secondary" id="new-shipment">Nuevo Envío</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vista de Historial -->
+            <section id="list-view" class="view">
+                <div class="list-container">
+                    <h2>Historial de Envíos</h2>
+                    <div class="filters">
+                        <input type="date" id="filter-date" class="filter-input">
+                        <button class="btn btn-primary" id="filter-btn">Filtrar por Fecha</button>
+                        <button class="btn btn-secondary" id="show-all-btn">Mostrar Todos</button>
+                    </div>
+                    <div id="shipments-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Fecha</th>
+                                    <th>Remitente</th>
+                                    <th>Destinatario</th>
+                                    <th>Servicio</th>
+                                    <th>Paquetería</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shipments-tbody">
+                                <!-- Datos dinámicos -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vista de Reportes -->
+            <section id="reports-view" class="view">
+                <div class="reports-container">
+                    <h2>Reportes Diarios</h2>
+                    <div class="filters">
+                        <input type="date" id="report-date" class="filter-input">
+                        <button class="btn btn-primary" id="generate-report-btn">Generar Reporte</button>
+                        <button class="btn btn-secondary" id="today-report-btn">Reporte de Hoy</button>
+                    </div>
+
+                    <div id="report-content" class="report-content">
+                        <!-- Contenido del reporte dinámico -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Sistema de Gestión de Envíos &copy; 2024</p>
+        </footer>
+    </div>
+
+    <script src="js/bluetoothPrinter.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
